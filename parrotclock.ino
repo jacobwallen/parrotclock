@@ -24,7 +24,9 @@ Servo servo;
 byte angle = 10; // Servo angle value valid: 0-179
 byte prevAngle = angle - 1; // Init prev angle to something impossible to force update on next iteration
 const byte servoMin = 7;
-const byte servoMax = 145;
+const byte servoMaxStd = 145;
+const byte servoMaxElac = 104;
+byte servoMax;
 // IO pins
 // Servo attaches to 5 during setup()
 const byte siren = 6;
@@ -252,6 +254,12 @@ void updateLedClock()
 void updateServo()
 {
   // Map servo position to timers total in ms 420000ms = 7 minutes
+  if (elacMode) {
+    servoMax = servoMaxElac;
+  }
+  else {
+    servoMax = servoMaxStd;
+  }
   angle = map(timer.get_time(), 0, heatTime, servoMin, servoMax);
   if (angle != prevAngle)
   {
@@ -378,7 +386,10 @@ void textRoll()
         P--;
         lc.setChar(0, P, 'A', false);
         P--;
-        lc.setChar(0, P, 'C', false);
+        lc.setLed(0, P, 1, true);
+        lc.setLed(0, P, 4, true); // C
+        lc.setLed(0, P, 5, true);
+        lc.setLed(0, P, 6, true);
         P--;
       }
     lc.setLed(0, P, 0, false);
